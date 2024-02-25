@@ -329,7 +329,8 @@ func TestVoteExtensionsAreAlwaysSigned(t *testing.T) {
 	assert.NotNil(t, vpb1.ExtensionSignature)
 
 	vesb1 := types.VoteExtensionSignBytes("mychainid", vpb1)
-	assert.True(t, pubKey.VerifySignature(vesb1, vpb1.ExtensionSignature))
+	bz1 := tmhash.Sum(vesb1)
+	assert.True(t, pubKey.VerifySignature(bz1, vpb1.ExtensionSignature))
 
 	// We duplicate this vote precisely, including its timestamp, but change
 	// its extension
@@ -345,8 +346,9 @@ func TestVoteExtensionsAreAlwaysSigned(t *testing.T) {
 	// extension, and does not validate against the vote extension sign bytes
 	// with the old extension.
 	vesb2 := types.VoteExtensionSignBytes("mychainid", vpb2)
-	assert.True(t, pubKey.VerifySignature(vesb2, vpb2.ExtensionSignature))
-	assert.False(t, pubKey.VerifySignature(vesb1, vpb2.ExtensionSignature))
+	bz2 := tmhash.Sum(vesb2)
+	assert.True(t, pubKey.VerifySignature(bz2, vpb2.ExtensionSignature))
+	assert.False(t, pubKey.VerifySignature(bz1, vpb2.ExtensionSignature))
 
 	// We now manipulate the timestamp of the vote with the extension, as per
 	// TestDifferByTimestamp
@@ -361,8 +363,9 @@ func TestVoteExtensionsAreAlwaysSigned(t *testing.T) {
 	assert.Equal(t, expectedTimestamp, vpb2.Timestamp)
 
 	vesb3 := types.VoteExtensionSignBytes("mychainid", vpb2)
-	assert.True(t, pubKey.VerifySignature(vesb3, vpb2.ExtensionSignature))
-	assert.False(t, pubKey.VerifySignature(vesb1, vpb2.ExtensionSignature))
+	bz3 := tmhash.Sum(vesb3)
+	assert.True(t, pubKey.VerifySignature(bz3, vpb2.ExtensionSignature))
+	assert.False(t, pubKey.VerifySignature(bz1, vpb2.ExtensionSignature))
 }
 
 func newVote(addr types.Address, height int64, round int32,

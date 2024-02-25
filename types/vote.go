@@ -9,7 +9,6 @@ import (
 	cmtcons "github.com/cometbft/cometbft/api/cometbft/consensus/v1"
 	cmtproto "github.com/cometbft/cometbft/api/cometbft/types/v1"
 	"github.com/cometbft/cometbft/crypto"
-	"github.com/cometbft/cometbft/crypto/tmhash"
 	"github.com/cometbft/cometbft/internal/protoio"
 	cmtbytes "github.com/cometbft/cometbft/libs/bytes"
 )
@@ -215,8 +214,7 @@ func (vote *Vote) verifyAndReturnProto(chainID string, pubKey crypto.PubKey) (*c
 		return nil, ErrVoteInvalidValidatorAddress
 	}
 	v := vote.ToProto()
-	bz := tmhash.Sum(VoteSignBytes(chainID, v))
-	if !pubKey.VerifySignature(bz, vote.Signature) {
+	if !pubKey.VerifySignature(VoteSignBytes(chainID, v), vote.Signature) {
 		return nil, ErrVoteInvalidSignature
 	}
 	return v, nil

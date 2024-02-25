@@ -339,7 +339,7 @@ func verifyCommitSingle(
 		valIdx             int32
 		seenVals           = make(map[int32]int, len(commit.Signatures))
 		talliedVotingPower int64
-		// voteSignBytes      []byte
+		voteSignBytes      []byte
 	)
 	for idx, commitSig := range commit.Signatures {
 		if ignoreSig(commitSig) {
@@ -376,9 +376,8 @@ func verifyCommitSingle(
 			return fmt.Errorf("validator %v has a nil PubKey at index %d", val, idx)
 		}
 
-		// BLST requires messages to be of size 32 bytes
-		bz := tmhash.Sum(commit.VoteSignBytes(chainID, int32(idx)))
-		if !val.PubKey.VerifySignature(bz, commitSig.Signature) {
+		voteSignBytes = commit.VoteSignBytes(chainID, int32(idx))
+		if !val.PubKey.VerifySignature(voteSignBytes, commitSig.Signature) {
 			return fmt.Errorf("wrong signature (#%d): %X", idx, commitSig.Signature)
 		}
 

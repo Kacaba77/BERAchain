@@ -3,9 +3,9 @@ package light_test
 import (
 	"time"
 
+	bls "github.com/berachain/comet-bls12-381"
 	cmtversion "github.com/cometbft/cometbft/api/cometbft/version/v1"
 	"github.com/cometbft/cometbft/crypto"
-	"github.com/cometbft/cometbft/crypto/ed25519"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	"github.com/cometbft/cometbft/types"
 	cmttime "github.com/cometbft/cometbft/types/time"
@@ -24,8 +24,12 @@ type privKeys []crypto.PrivKey
 // genPrivKeys produces an array of private keys to generate commits.
 func genPrivKeys(n int) privKeys {
 	res := make(privKeys, n)
+	var err error
 	for i := range res {
-		res[i] = ed25519.GenPrivKey()
+		res[i], err = bls.GenPrivKey()
+		if err != nil {
+			panic(err)
+		}
 	}
 	return res
 }

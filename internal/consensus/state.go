@@ -16,7 +16,6 @@ import (
 	cmtproto "github.com/cometbft/cometbft/api/cometbft/types/v1"
 	cfg "github.com/cometbft/cometbft/config"
 	"github.com/cometbft/cometbft/crypto"
-	"github.com/cometbft/cometbft/crypto/tmhash"
 	cstypes "github.com/cometbft/cometbft/internal/consensus/types"
 	cmtevents "github.com/cometbft/cometbft/internal/events"
 	"github.com/cometbft/cometbft/internal/fail"
@@ -1983,10 +1982,8 @@ func (cs *State) defaultSetProposal(proposal *types.Proposal) error {
 	p := proposal.ToProto()
 	// Verify signature
 	pubKey := cs.Validators.GetProposer().PubKey
-	// verifying bls signatures requires the message to be a size of 32 bytes.
-	bz := tmhash.Sum(types.ProposalSignBytes(cs.state.ChainID, p))
 	if !pubKey.VerifySignature(
-		bz, proposal.Signature,
+		types.ProposalSignBytes(cs.state.ChainID, p), proposal.Signature,
 	) {
 		return ErrInvalidProposalSignature
 	}
