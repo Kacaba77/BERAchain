@@ -49,3 +49,8 @@ endif
 ifeq (pebbledb,$(findstring pebbledb,$(COMETBFT_BUILD_OPTIONS)))
   BUILD_TAGS += pebbledb
 endif
+
+# handle bls
+ifeq (blst,$(findstring blst,$(COMETBFT_BUILD_OPTIONS)))
+  BUILD_TAGS += blst
+endif

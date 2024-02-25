@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	bls "github.com/berachain/comet-bls12-381"
 	"github.com/cosmos/gogoproto/proto"
 
 	cmtproto "github.com/cometbft/cometbft/api/cometbft/types/v1"
@@ -180,16 +179,6 @@ func NewFilePV(privKey crypto.PrivKey, keyFilePath, stateFilePath string) *FileP
 			filePath: stateFilePath,
 		},
 	}
-}
-
-// GenFilePV generates a new validator with randomly generated private key
-// and sets the filePaths, but does not call Save().
-func GenFilePV(keyFilePath, stateFilePath string) *FilePV {
-	key, err := bls.GenPrivKey()
-	if err != nil {
-		cmtos.Exit(err.Error())
-	}
-	return NewFilePV(key, keyFilePath, stateFilePath)
 }
 
 // LoadFilePV loads a FilePV from the filePaths.  The FilePV handles double
