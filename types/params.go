@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	bls "github.com/berachain/comet-bls12-381"
 	cmtproto "github.com/cometbft/cometbft/api/cometbft/types/v1"
 	"github.com/cometbft/cometbft/crypto/ed25519"
 	"github.com/cometbft/cometbft/crypto/secp256k1"
@@ -23,7 +24,7 @@ const (
 
 	ABCIPubKeyTypeEd25519   = ed25519.KeyType
 	ABCIPubKeyTypeSecp256k1 = secp256k1.KeyType
-	ABCIPubKeyTypeBLS12381  = "bls12_381" // TODO: add support for BLS12381 to crypto
+	ABCIPubKeyTypeBLS12381  = bls.KeyType
 )
 
 var ABCIPubKeyTypesToNames = map[string]string{

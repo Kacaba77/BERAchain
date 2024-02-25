@@ -3,6 +3,7 @@ package encoding
 import (
 	"fmt"
 
+	bls "github.com/berachain/comet-bls12-381"
 	pc "github.com/cometbft/cometbft/api/cometbft/crypto/v1"
 	"github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/crypto/ed25519"
@@ -53,6 +54,12 @@ func PubKeyToProto(k crypto.PubKey) (pc.PublicKey, error) {
 				Secp256K1: k,
 			},
 		}
+	case bls.PubKey:
+		kp = pc.PublicKey{
+			Sum: &pc.PublicKey_Bls12381{
+				Bls12381: k,
+			},
+		}
 	default:
 		return kp, ErrUnsupportedKey{Key: k}
 	}
@@ -83,6 +90,18 @@ func PubKeyFromProto(k pc.PublicKey) (crypto.PubKey, error) {
 		}
 		pk := make(secp256k1.PubKey, secp256k1.PubKeySize)
 		copy(pk, k.Secp256K1)
+		return pk, nil
+
+	case *pc.PublicKey_Bls12381:
+		if len(k.Bls12381) != bls.PubKeySize {
+			return nil, ErrInvalidKeyLen{
+				Key:  k,
+				Got:  len(k.Bls12381),
+				Want: bls.PubKeySize,
+			}
+		}
+		pk := make(bls.PubKey, bls.PubKeySize)
+		copy(pk, k.Bls12381)
 		return pk, nil
 	default:
 		return nil, ErrUnsupportedKey{Key: k}

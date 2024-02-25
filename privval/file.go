@@ -7,11 +7,12 @@ import (
 	"os"
 	"time"
 
+	bls "github.com/berachain/comet-bls12-381"
 	"github.com/cosmos/gogoproto/proto"
 
 	cmtproto "github.com/cometbft/cometbft/api/cometbft/types/v1"
 	"github.com/cometbft/cometbft/crypto"
-	"github.com/cometbft/cometbft/crypto/ed25519"
+	"github.com/cometbft/cometbft/crypto/tmhash"
 	cmtos "github.com/cometbft/cometbft/internal/os"
 	"github.com/cometbft/cometbft/internal/protoio"
 	"github.com/cometbft/cometbft/internal/tempfile"
@@ -185,7 +186,11 @@ func NewFilePV(privKey crypto.PrivKey, keyFilePath, stateFilePath string) *FileP
 // GenFilePV generates a new validator with randomly generated private key
 // and sets the filePaths, but does not call Save().
 func GenFilePV(keyFilePath, stateFilePath string) *FilePV {
-	return NewFilePV(ed25519.GenPrivKey(), keyFilePath, stateFilePath) //TODO: modify this to bls
+	key, err := bls.GenPrivKey()
+	if err != nil {
+		cmtos.Exit(err.Error())
+	}
+	return NewFilePV(key, keyFilePath, stateFilePath)
 }
 
 // LoadFilePV loads a FilePV from the filePaths.  The FilePV handles double
@@ -363,7 +368,9 @@ func (pv *FilePV) signVote(chainID string, vote *cmtproto.Vote) error {
 	}
 
 	// It passed the checks. Sign the vote
-	sig, err := pv.Key.PrivKey.Sign(signBytes)
+	// BLST reqiuries a message size of 32 bytes
+	bz := tmhash.Sum(types.VoteSignBytes(chainID, vote))
+	sig, err := pv.Key.PrivKey.Sign(bz)
 	if err != nil {
 		return err
 	}
@@ -406,12 +413,14 @@ func (pv *FilePV) signProposal(chainID string, proposal *cmtproto.Proposal) erro
 		return err
 	}
 
+	bz := tmhash.Sum(types.ProposalSignBytes(chainID, proposal))
+
 	// It passed the checks. Sign the proposal
-	sig, err := pv.Key.PrivKey.Sign(signBytes)
+	sig, err := pv.Key.PrivKey.Sign(bz)
 	if err != nil {
 		return err
 	}
-	pv.saveSigned(height, round, step, signBytes, sig)
+	pv.saveSigned(height, round, step, bz, sig)
 	proposal.Signature = sig
 	return nil
 }

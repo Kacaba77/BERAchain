@@ -5,7 +5,7 @@ BUILDDIR?=$(CURDIR)/build
 OUTPUT?=$(BUILDDIR)/cometbft
 
 HTTPS_GIT := https://github.com/cometbft/cometbft.git
-CGO_ENABLED ?= 0
+CGO_ENABLED ?= 1
 
 # Process Docker environment variable TARGETPLATFORM
 # in order to build binary with correspondent ARCH
