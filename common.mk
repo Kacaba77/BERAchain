@@ -41,3 +41,8 @@ endif
 ifeq (boltdb,$(findstring boltdb,$(COMETBFT_BUILD_OPTIONS)))
   BUILD_TAGS += boltdb
 endif
+
+# handle bls
+ifeq (blst,$(findstring blst,$(COMETBFT_BUILD_OPTIONS)))
+  BUILD_TAGS += blst
+endif

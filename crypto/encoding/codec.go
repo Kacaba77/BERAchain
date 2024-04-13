@@ -8,6 +8,7 @@ import (
 	"github.com/cometbft/cometbft/crypto/secp256k1"
 	"github.com/cometbft/cometbft/libs/json"
 	pc "github.com/cometbft/cometbft/proto/tendermint/crypto"
+	bls "github.com/itsdevbear/comet-bls12-381"
 )
 
 func init() {
@@ -30,6 +31,12 @@ func PubKeyToProto(k crypto.PubKey) (pc.PublicKey, error) {
 		kp = pc.PublicKey{
 			Sum: &pc.PublicKey_Secp256K1{
 				Secp256K1: k,
+			},
+		}
+	case bls.PubKey:
+		kp = pc.PublicKey{
+			Sum: &pc.PublicKey_Bls12381{
+				Bls12381: k,
 			},
 		}
 	default:
@@ -56,6 +63,14 @@ func PubKeyFromProto(k pc.PublicKey) (crypto.PubKey, error) {
 		}
 		pk := make(secp256k1.PubKey, secp256k1.PubKeySize)
 		copy(pk, k.Secp256K1)
+		return pk, nil
+	case *pc.PublicKey_Bls12381:
+		if len(k.Bls12381) != bls.PubKeySize {
+			return nil, fmt.Errorf("invalid size for PubKeySecp256k1. Got %d, expected %d",
+				len(k.Bls12381), secp256k1.PubKeySize)
+		}
+		pk := make(bls.PubKey, bls.PubKeySize)
+		copy(pk, k.Bls12381)
 		return pk, nil
 	default:
 		return nil, fmt.Errorf("fromproto: key type %v is not supported", k)
