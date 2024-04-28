@@ -27,7 +27,7 @@ consensus algorithm.
 
 For protocol details, refer to the [CometBFT Specification](./spec/README.md).
 
-For detailed analysis of the consensus protocol, including safety and liveness
+For detailed analysis of the consensus protocol, including  safety  and  liveness
 proofs, read our paper, "[The latest gossip on BFT
 consensus](https://arxiv.org/abs/1807.04938)".
 
